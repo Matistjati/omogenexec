@@ -127,7 +127,7 @@ func initGpp() (*Language, error) {
 
 const rustPath = "/usr/bin/rustc"
 
-var rustFlags = []string{"-O", "--crate-type", "bin", "--edition", "2021", "-o", "executable", "{files}"}
+var rustFlags = []string{"-C", "opt-level=3", "-C", "target-cpu=native", "-O", "--crate-type", "bin", "--edition", "2024", "-o", "executable", "{files}"}
 var isRustFile = hasExt([]string{".rs"})
 
 func initRust() (*Language, error) {
