@@ -409,6 +409,6 @@ http_file(
 http_file(
     name = "omogenfs-rust",
     urls = ["https://github.com/Matistjati/omogenexec-fs/releases/download/2025-03-07/omogen-rust-fs.tar.zst"],
-    sha256 = "fc2309480d760dc608f201598f784b487738450545ec459c8cd63ed77159858d",
+    sha256 = "efa88bbd2908b8317d5abc021e84331b86840eb478289d905635cc0e6cbfacb5",
     downloaded_file_path = "rust.tar.zst",
 )
