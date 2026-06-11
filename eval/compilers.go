@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -99,6 +100,82 @@ func simpleCompile(compilerPath string, compilerFlags []string, exec []string, f
 			Program: &apipb.CompiledProgram{
 				ProgramRoot: outputBase.Path(),
 				RunCommand:  exec,
+				Language:    language,
+			}}, nil
+	}
+}
+
+var rustMainRe = regexp.MustCompile(`(?m)\bfn\s+main\s*\(`)
+
+// findRustCrateRoot returns the single .rs file to hand to rustc, or a non-empty
+// error string suitable as a CompilerErrors message. Unlike C++, rustc accepts
+// only one input file (the crate root); sibling files are pulled in via `mod`
+// declarations against the working directory.
+func findRustCrateRoot(sources []*apipb.SourceFile, filter func(string) bool) (string, string) {
+	var rsFiles []*apipb.SourceFile
+	for _, f := range sources {
+		if filter(f.Path) {
+			rsFiles = append(rsFiles, f)
+		}
+	}
+	if len(rsFiles) == 0 {
+		return "", "No valid source files found"
+	}
+	if len(rsFiles) == 1 {
+		return rsFiles[0].Path, ""
+	}
+	var mains []string
+	for _, f := range rsFiles {
+		if rustMainRe.Match(f.Contents) {
+			mains = append(mains, f.Path)
+		}
+	}
+	switch len(mains) {
+	case 0:
+		return "", "No main function found"
+	case 1:
+		return mains[0], ""
+	default:
+		return "", "Multiple main functions found"
+	}
+}
+
+// rustCompile compiles a Rust submission by passing only the crate root to the
+// compiler. It is structured like simpleCompile but selects a single input file
+// instead of every filtered source.
+func rustCompile(compilerPath string, compilerFlags []string, filter func(string) bool, language apipb.LanguageGroup) compileFunc {
+	return func(program *apipb.Program, outputBase util.FileBase) (*Compilation, error) {
+		crateRoot, errMsg := findRustCrateRoot(program.Sources, filter)
+		if errMsg != "" {
+			return &Compilation{CompilerErrors: errMsg}, nil
+		}
+		if err := outputBase.WriteFile("__compiler_input", []byte{}); err != nil {
+			return nil, err
+		}
+		sandboxArgs := sandboxForCompile(outputBase.Path(), language)
+		sandbox := newSandbox(0, sandboxArgs)
+		err := sandbox.Start()
+		if err != nil {
+			return nil, fmt.Errorf("couldn't start compilation sandbox: %v", err)
+		}
+		run, err := sandbox.Run(append([]string{compilerPath}, substituteFiles(compilerFlags, []string{crateRoot})...))
+		sandbox.Finish()
+		if err != nil {
+			return nil, fmt.Errorf("sandbox failed: %v, %v", err, sandbox.sandboxErr.String())
+		}
+		stderr, err := outputBase.ReadFile("__compiler_errors")
+		if err != nil {
+			return nil, fmt.Errorf("could not read compiler errors: %v", err)
+		}
+		if !run.CrashedWith(0) {
+			return &Compilation{
+				CompilerErrors: string(stderr),
+			}, nil
+		}
+		return &Compilation{
+			Program: &apipb.CompiledProgram{
+				ProgramRoot: outputBase.Path(),
+				RunCommand:  []string{"./executable"},
 				Language:    language,
 			}}, nil
 	}

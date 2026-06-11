@@ -144,7 +144,7 @@ func initRust() (*Language, error) {
 			CompilationDescription: []string{fmt.Sprintf("rustc %s", rustFlags)},
 			RunDescription:         "./executable",
 		},
-		compile: simpleCompile(rustPath, rustFlags, []string{"./executable"}, isRustFile, apipb.LanguageGroup_RUST),
+		compile: rustCompile(rustPath, rustFlags, isRustFile, apipb.LanguageGroup_RUST),
 	}, nil
 }
 

@@ -23,6 +23,10 @@ go_library(
 
 go_test(
     name = "eval_test",
-    srcs = ["diff_test.go"],
+    srcs = [
+        "diff_test.go",
+        "rust_test.go",
+    ],
     embed = [":eval"],
+    deps = ["//api"],
 )
