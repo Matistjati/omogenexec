@@ -350,6 +350,9 @@ func defaultGrader(results []*apipb.Result, tg *apipb.TestGroup) *apipb.Result {
 			result.TimeUsageMs = res.TimeUsageMs
 		}
 	}
+	if tg.ScoringMode == apipb.ScoringMode_AVG && len(results) > 0 {
+		result.Score /= float64(len(results))
+	}
 
 	if tg.VerdictMode == apipb.VerdictMode_ALWAYS_ACCEPT || (anyAccepted && tg.AcceptIfAnyAccepted) {
 		result.Verdict = apipb.Verdict_ACCEPTED
