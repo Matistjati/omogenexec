@@ -16,7 +16,7 @@ The sandbox uses this functionality to prevent submissions from writing too much
 
 Next, install the sandbox from the latest `omogenexec-debian.deb` [release](https://github.com/jsannemo/omogenexec/releases/tag/v1.3.1).
 
-You can verify that the sandbox is working by running `printf '\x01/bin/true\x00' | omogenexec --sandbox-id 1 --blocks 1024 --inodes 1024 --memory-mb 1024 --time-lim-ms 1000 --wall-time-lim-ms 1000 --pid-limit 1 2>/dev/null`.
+You can verify that the sandbox is working by running `printf '\x01/bin/true\x00' | omogenexec --sandbox-id 1 --blocks 1024 --inodes 1024 --memory-mib 1024 --time-lim-ms 1000 --wall-time-lim-ms 1000 --pid-limit 1 2>/dev/null`.
 The output should be
 ```
 code 0

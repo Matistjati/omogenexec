@@ -20,11 +20,11 @@ message EvaluationPlan {
 
   CompiledProgram program = 3;
   int32 time_limit_ms = 5;
-  int32 mem_limit_kb = 6;
+  int32 mem_limit_mib = 6;
 
   CompiledProgram validator = 4;
   int32 validator_time_limit_ms = 7;
-  int32 validator_mem_limit_kb = 8;
+  int32 validator_mem_limit_mib = 8;
   bool scoring_validator = 9;
 
   CompiledProgram grader = 10;

@@ -276,7 +276,7 @@ func sandboxForCompile(sourcePath string, language apipb.LanguageGroup) sandboxA
 		ErrorPath:        path.Join(sourcePath, "__compiler_errors"),
 		ExtraWritePaths:  []string{sourcePath},
 		TimeLimitMs:      60 * 1000,
-		MemoryLimitKb:    1000 * 1000,
+		MemoryLimitMiB:   1 * GiB,
 		Pids:             30,
 		Env:              map[string]string{"TMPDIR": sourcePath},
 	}

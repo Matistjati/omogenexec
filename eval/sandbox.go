@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+// Memory sizes, expressed in MiB.
+const (
+	MiB = 1
+	GiB = 1024 * MiB
+)
+
 type sandboxArgs struct {
 	WorkingDirectory  string
 	InputPath         string
@@ -20,7 +26,7 @@ type sandboxArgs struct {
 	ExtraWritePaths   []string
 	SkipDefaultMounts bool
 	TimeLimitMs       int
-	MemoryLimitKb     int
+	MemoryLimitMiB    int
 	Pids              int
 	Env               map[string]string
 }
@@ -38,7 +44,7 @@ func newSandbox(id int, args sandboxArgs) *sandboxWrapper {
 		"--sandbox-id", strconv.Itoa(id),
 		"--time-lim-ms", strconv.Itoa(args.TimeLimitMs),
 		"--wall-time-lim-ms", strconv.Itoa(args.TimeLimitMs*2 + 1000),
-		"--memory-mb", strconv.Itoa(args.MemoryLimitKb),
+		"--memory-mib", strconv.Itoa(args.MemoryLimitMiB),
 		"--inodes", "1000",
 		"--blocks", strconv.Itoa(1_000_000_000 / 4096),
 	}
@@ -153,7 +159,7 @@ func (s *sandboxWrapper) Run(cmdAndArgs []string) (*execResult, error) {
 			if err != nil {
 				logger.Fatalf("Unrecognized output from sandbox (mem %s)", memStr)
 			}
-			res.MemoryUsageKb = mem / 1000
+			res.MemoryUsageKiB = mem / 1024
 		} else if tok == "cpu" {
 			cpuStr := s.sandboxToken()
 			cpu, err := strconv.ParseInt(cpuStr, 10, 64)

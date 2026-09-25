@@ -84,7 +84,7 @@ func (e *Evaluator) initProgram() error {
 		},
 		ExtraWritePaths: nil,
 		TimeLimitMs:     int(e.plan.TimeLimitMs),
-		MemoryLimitKb:   int(e.plan.MemLimitKb),
+		MemoryLimitMiB:  int(e.plan.MemLimitMib),
 	}
 	setLanguageSandbox(&args, e.plan.Program.Language)
 	e.programSandbox = newSandbox(0, args)
@@ -112,8 +112,8 @@ func (e *Evaluator) initValidator() error {
 		ExtraWritePaths: []string{
 			e.valLinker.writeBase.Path(),
 		},
-		TimeLimitMs:   int(e.plan.ValidatorTimeLimitMs),
-		MemoryLimitKb: int(e.plan.ValidatorMemLimitKb),
+		TimeLimitMs:    int(e.plan.ValidatorTimeLimitMs),
+		MemoryLimitMiB: int(e.plan.ValidatorMemLimitMib),
 	}
 	if e.plan.PlanType == apipb.EvaluationType_INTERACTIVE {
 		args.OutputPath = e.linker.PathFor("input", false)
@@ -157,8 +157,8 @@ func (e *Evaluator) initGrader() error {
 		ExtraWritePaths: []string{
 			e.graderLinker.writeBase.Path(),
 		},
-		TimeLimitMs:   int((60 * time.Second).Milliseconds()),
-		MemoryLimitKb: 1000 * 1000, // 1000 MB = 1 GB
+		TimeLimitMs:    int((60 * time.Second).Milliseconds()),
+		MemoryLimitMiB: 1 * GiB,
 	}
 	e.graderSandbox = newSandbox(2, args)
 	e.graderCommandTemplate = e.plan.Grader.GetRunCommand()

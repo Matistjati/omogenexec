@@ -23,7 +23,7 @@ type execResult struct {
 	// The Time the execution used.
 	TimeUsageMs int64
 	// The memory the execution used.
-	MemoryUsageKb int
+	MemoryUsageKiB int
 }
 
 // CrashedWith checks whether the program exited normally with the given code.

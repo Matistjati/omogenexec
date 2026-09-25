@@ -62,9 +62,9 @@ struct Opt {
     /// The file system inode quota
     #[clap(long)]
     inodes: u64,
-    /// The memory limit in megabytes.
+    /// The memory limit in MiB.
     #[clap(long)]
-    memory_mb: u64,
+    memory_mib: u64,
     /// The CPU time limit in milliseconds.
     #[clap(long)]
     time_lim_ms: u64,
@@ -104,7 +104,7 @@ fn main() {
         readable: opt.readable,
         writable: opt.writable,
         working_directory: PathBuf::from(opt.working_dir),
-        mem_limit_bytes: opt.memory_mb as i64 * 1024 * 1024,
+        mem_limit_bytes: opt.memory_mib as i64 * 1024 * 1024,
         time_lim: std::time::Duration::from_millis(opt.time_lim_ms),
         wall_time_lim: std::time::Duration::from_millis(opt.wall_time_lim_ms),
         pid_limit: opt.pid_limit,

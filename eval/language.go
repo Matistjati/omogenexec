@@ -223,11 +223,11 @@ func runCommandInSandbox(command []string, lang apipb.LanguageGroup) (string, er
 	outputPath := path.Join(tmpdir, "out")
 	errorPath := path.Join(tmpdir, "err")
 	args := sandboxArgs{
-		InputPath:     inputPath,
-		OutputPath:    outputPath,
-		ErrorPath:     errorPath,
-		TimeLimitMs:   10_000,
-		MemoryLimitKb: 500_000,
+		InputPath:      inputPath,
+		OutputPath:     outputPath,
+		ErrorPath:      errorPath,
+		TimeLimitMs:    10_000,
+		MemoryLimitMiB: 512 * MiB,
 	}
 	setLanguageSandbox(&args, lang)
 	sandbox := newSandbox(0, args)
