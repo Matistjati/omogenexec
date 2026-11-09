@@ -197,6 +197,9 @@ func TestDiff_Description(t *testing.T) {
 		{reference: "1 2\n3 4", output: "1 2\n3 5", want: "Output was 5, expected 4"},
 		{reference: "Yes", output: "yes", args: DiffArgs{CaseSensitive: true}, want: "Output was yes, expected Yes (difference in casing)"},
 		{reference: "1.0", output: "x", args: DiffArgs{ParseFloats: true}, want: "Reference was decimal, output was: x"},
+		{reference: "1 2", output: "1", want: "Expected more output (next reference token: 2)"},
+		{reference: "1\n2", output: "", want: "Expected more output (next reference token: 1)"},
+		{reference: "1", output: "1\n2 3", want: "Too much output (next output token: 2)"},
 	}
 	for _, tc := range cases {
 		diff, err := Diff(strings.NewReader(tc.reference), strings.NewReader(tc.output), tc.args)

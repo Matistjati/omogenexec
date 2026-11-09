@@ -47,7 +47,7 @@ func Diff(reference, output io.Reader, args DiffArgs) (*DiffResult, error) {
 		refStr := string(refToken.Token)
 		outToken, err := out.Scan()
 		if err == io.EOF {
-			return &DiffResult{false, fmt.Sprintf("Expected more output (next reference token: %s at %v)", refStr, refToken.Pos)}, nil
+			return &DiffResult{false, fmt.Sprintf("Expected more output (next reference token: %s)", refStr)}, nil
 		} else if err != nil {
 			return nil, fmt.Errorf("failed reading output: %v", err)
 		}
@@ -62,7 +62,7 @@ func Diff(reference, output io.Reader, args DiffArgs) (*DiffResult, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &DiffResult{false, fmt.Sprintf("Too much output (next output token: %s at %v)", string(outToken.Token), outToken.Pos)}, nil
+		return &DiffResult{false, fmt.Sprintf("Too much output (next output token: %s)", string(outToken.Token))}, nil
 	}
 	return &DiffResult{Match: true}, nil
 }
