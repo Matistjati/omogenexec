@@ -185,6 +185,34 @@ func TestDiff_SpaceSensitive(t *testing.T) {
 	}
 }
 
+func TestDiff_Description(t *testing.T) {
+	cases := []struct {
+		reference string
+		output    string
+		args      DiffArgs
+		want      string
+	}{
+		{reference: "6", output: "7", want: "Output was 7, expected 6"},
+		// The description says what differs, not where in the files the difference is.
+		{reference: "1 2\n3 4", output: "1 2\n3 5", want: "Output was 5, expected 4"},
+		{reference: "Yes", output: "yes", args: DiffArgs{CaseSensitive: true}, want: "Output was yes, expected Yes (difference in casing)"},
+		{reference: "1.0", output: "x", args: DiffArgs{ParseFloats: true}, want: "Reference was decimal, output was: x"},
+	}
+	for _, tc := range cases {
+		diff, err := Diff(strings.NewReader(tc.reference), strings.NewReader(tc.output), tc.args)
+		if err != nil {
+			t.Errorf("Got unexpected error from Diff: %v", err)
+			continue
+		}
+		if diff.Match {
+			t.Errorf("Expected %q and %q to differ", tc.reference, tc.output)
+		}
+		if diff.Description != tc.want {
+			t.Errorf("Got description %q, want %q", diff.Description, tc.want)
+		}
+	}
+}
+
 func runTest(test testCase, args DiffArgs, t *testing.T) {
 	diff, err := Diff(strings.NewReader(test.reference), strings.NewReader(test.output), args)
 	if err != nil {

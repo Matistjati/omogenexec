@@ -54,7 +54,7 @@ func Diff(reference, output io.Reader, args DiffArgs) (*DiffResult, error) {
 		outStr := string(outToken.Token)
 		match, desc := matchToken(refStr, outStr, args)
 		if !match {
-			return &DiffResult{false, fmt.Sprintf("%s (output %v, reference %v)", desc, outToken.Pos, refToken.Pos)}, nil
+			return &DiffResult{false, desc}, nil
 		}
 	}
 	outToken, err := out.Scan()
