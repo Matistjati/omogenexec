@@ -24,6 +24,8 @@ const (
 
 func (e *Evaluator) GetResultForGroup(tcRes *apipb.Result, tg *apipb.TestGroup) *apipb.Result {
 	updatedResult := *tcRes
+	// The feedback describes the run of another test case (with the same data).
+	updatedResult.Feedback = nil
 	if !e.plan.ScoringValidator {
 		if tcRes.Verdict == apipb.Verdict_ACCEPTED {
 			updatedResult.Score = tg.AcceptScore
@@ -578,6 +580,10 @@ func (e *Evaluator) evaluateCase(tc *apipb.TestCase, tg *apipb.TestGroup) (*apip
 		}
 	}
 	res.TimeUsageMs = exit.TimeUsageMs
+	// This must happen before a later test case with the same name gets to overwrite the output.
+	if tc.FeedbackLimitBytes > 0 && res.Verdict != apipb.Verdict_ACCEPTED {
+		res.Feedback = caseFeedback(tc, tcPath, exit)
+	}
 	if err := e.linker.Clear(); err != nil {
 		return nil, fmt.Errorf("failed clearing program env: %v", err)
 	}
@@ -587,7 +593,8 @@ func (e *Evaluator) evaluateCase(tc *apipb.TestCase, tg *apipb.TestGroup) (*apip
 		}
 	}
 	e.resultChan <- res
-	logger.Infof("finished test case %s: %v", tc.Name, res)
+	// Don't log the entire result: the feedback contains output from the submission.
+	logger.Infof("finished test case %s: verdict %v, score %v, time %d ms", tc.Name, res.Verdict, res.Score, res.TimeUsageMs)
 	return res, nil
 }
 

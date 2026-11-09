@@ -71,6 +71,11 @@ message TestCase {
   string name = 1;
   string input_path = 2;
   string output_path = 3;
+  // If > 0 and the submission is not accepted on this case, Result.feedback
+  // is set, containing at most this many bytes of each of the submission's
+  // standard output and standard error.
+  // Has no effect for interactive evaluations.
+  int32 feedback_limit_bytes = 4;
 }
 
 enum Verdict {
@@ -87,10 +92,32 @@ enum ResultType {
   TEST_GROUP = 2;
 }
 
+// Details about a rejected run of a test case, see
+// TestCase.feedback_limit_bytes.
+message CaseFeedback {
+  // The name of the test case that the feedback is for.
+  string case_name = 1;
+  // A prefix of what the submission wrote to standard output.
+  bytes team_output = 2;
+  // Whether the output was longer than what team_output contains.
+  bool team_output_truncated = 3;
+  // A prefix of what the submission wrote to standard error.
+  bytes team_error = 4;
+  // Whether the error output was longer than what team_error contains.
+  bool team_error_truncated = 5;
+  // Only meaningful for the verdict RUN_TIME_ERROR: if signal is non-zero the
+  // submission was killed by that signal, otherwise exit_code is its
+  // (non-zero) exit code.
+  int32 exit_code = 6;
+  int32 signal = 7;
+}
+
 message Result {
   ResultType type = 1;
   Verdict verdict = 2;
   double score = 3;
   int64 time_usage_ms = 4;
   string message = 5;
+  // Only set for rejected test cases with feedback_limit_bytes set.
+  CaseFeedback feedback = 6;
 }

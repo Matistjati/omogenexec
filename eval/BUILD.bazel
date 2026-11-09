@@ -6,6 +6,7 @@ go_library(
         "compilers.go",
         "diff.go",
         "eval.go",
+        "feedback.go",
         "filelinker.go",
         "language.go",
         "runnable.go",
@@ -25,6 +26,7 @@ go_test(
     name = "eval_test",
     srcs = [
         "diff_test.go",
+        "feedback_test.go",
         "rust_test.go",
     ],
     embed = [":eval"],
